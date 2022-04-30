@@ -21,14 +21,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final String url =
-      'https://gist.githubusercontent.com/viztushar/e359e5aeadc4fcfece7b48149fb580fe/raw/b58fe6d6d0607a423d9a6ba5fd0a4ec3a0b8f2c4/whatsapp.json';
+  final String url = 'https://gist.githubusercontent.com/viztushar/e359e5aeadc4fcfece7b48149fb580fe/raw/' +
+      'b58fe6d6d0607a423d9a6ba5fd0a4ec3a0b8f2c4/whatsapp.json';
   StickerPacks stickerPack = StickerPacks();
-  List<StickerPacks> st = List<StickerPacks>();
+  List<StickerPacks> st = [];
   bool isLoading, isDownloading = true;
   int iD = -1;
-  List<String> downloadList = List<String>();
-  List<String> stickerImageList = List<String>();
+  List<String> downloadList = [];
+  List<String> stickerImageList = [];
   @override
   void initState() {
     super.initState();
@@ -47,10 +47,9 @@ class _MyHomePageState extends State<MyHomePage> {
       Map datas = jsonDecode(response.body);
       Model m = Model.formJson(datas);
       for (Map<String, dynamic> json in m.stickerPac) {
-        List<Stickers> s = List<Stickers>();
+        List<Stickers> s = [];
         for (Map<String, dynamic> stickers in json['stickers']) {
-          s.add(Stickers(
-              imagefile: stickers['image_file'], emojis: stickers['emojis']));
+          s.add(Stickers(imagefile: stickers['image_file'], emojis: stickers['emojis']));
         }
         print(json['publisher_email'] +
             " " +
@@ -107,8 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               },
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Row(
                                     children: <Widget>[
@@ -140,8 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                   Wrap(
                                     alignment: WrapAlignment.start,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
+                                    crossAxisAlignment: WrapCrossAlignment.center,
                                     direction: Axis.horizontal,
                                     spacing: 8.0,
                                     runSpacing: 4.0,
@@ -187,8 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Flex(
                                   direction: Axis.horizontal,
                                   children: <Widget>[
-                                    if (!downloadList
-                                        .contains(st[i].identiFier)) ...[
+                                    if (!downloadList.contains(st[i].identiFier))
                                       iD == i && !isDownloading
                                           ? CircularProgressIndicator()
                                           : IconButton(
@@ -202,9 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 });
                                               },
                                             ),
-                                    ],
-                                    if (downloadList
-                                        .contains(st[i].identiFier)) ...[
+                                    if (downloadList.contains(st[i].identiFier))
                                       IconButton(
                                         icon: Icon(Icons.add),
                                         onPressed: () {
@@ -215,7 +209,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                           });
                                         },
                                       ),
-                                    ],
                                   ],
                                 ),
                               ],
@@ -235,8 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       print(s.identiFier);
       print(s.name);
-      WhatsappstickerApi.addStickerPackToWhatsApp(
-          identifier: s.identiFier, name: s.name);
+      WhatsappstickerApi.addStickerPackToWhatsApp(identifier: s.identiFier, name: s.name);
     } on PlatformException catch (e) {
       print(e.details);
     }
@@ -267,26 +259,15 @@ class _MyHomePageState extends State<MyHomePage> {
       await Permission.storage.request();
       Dio dio = Dio();
       var dirToSave = await getApplicationDocumentsDirectory();
-      var path = await Directory(dirToSave.path +
-              "/" +
-              "stickers_asset" +
-              "/" +
-              s.identiFier +
-              "/")
-          .create(recursive: true);
-      var trypath = await Directory(dirToSave.path +
-              "/" +
-              "stickers_asset" +
-              "/" +
-              s.identiFier +
-              "/try/")
+      var path =
+          await Directory(dirToSave.path + "/" + "stickers_asset" + "/" + s.identiFier + "/").create(recursive: true);
+      var trypath = await Directory(dirToSave.path + "/" + "stickers_asset" + "/" + s.identiFier + "/try/")
           .create(recursive: true);
       print(path.path + "\n" + trypath.path);
 
       String tryFilePath = trypath.path + basename(s.trayImageFile);
       print(tryFilePath);
-      await dio.download(s.trayImageFile, tryFilePath,
-          onReceiveProgress: (rec, total) {
+      await dio.download(s.trayImageFile, tryFilePath, onReceiveProgress: (rec, total) {
         print((rec / total) * 100);
         print("try image downloaded");
       });
@@ -294,8 +275,7 @@ class _MyHomePageState extends State<MyHomePage> {
       for (int i = 0; i < s.sticker.length; i++) {
         String imageFilePath = path.path + basename(s.sticker[i].imageFile);
         stickerImageList.add(basename(s.sticker[i].imageFile));
-        await dio.download(s.sticker[i].imageFile, imageFilePath,
-            onReceiveProgress: (rec, total) {
+        await dio.download(s.sticker[i].imageFile, imageFilePath, onReceiveProgress: (rec, total) {
           print((rec / total) * 100);
         });
       }
@@ -316,17 +296,6 @@ class _MyHomePageState extends State<MyHomePage> {
             .then((value) {
           print(value);
         });
-        // stickerMethodChannel.invokeMapMethod("addTOJson", {
-        //   "identiFier": s.identiFier,
-        //   "name": s.name,
-        //   "publisher": s.publisher,
-        //   "trayimagefile": basename(s.trayImageFile),
-        //   "publisheremail": s.publisherEmail,
-        //   "publisherwebsite": s.publisherWebsite,
-        //   "privacypolicywebsite": s.privacyPolicyWebsite,
-        //   "licenseagreementwebsite": s.licenseAgreementWebsite,
-        //   "sticker_image": stickerImageList,
-        // });
       } on PlatformException catch (e) {
         print(e.details);
       }
