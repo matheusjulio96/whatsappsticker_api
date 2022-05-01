@@ -16,6 +16,10 @@ import 'StickerDetails.dart';
 import 'package:dio/dio.dart';
 
 class MyHomePage extends StatefulWidget {
+  final List<StickerPacks> asdf;
+
+  MyHomePage(this.asdf);
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -24,54 +28,16 @@ class _MyHomePageState extends State<MyHomePage> {
   final String url = 'https://gist.githubusercontent.com/viztushar/e359e5aeadc4fcfece7b48149fb580fe/raw/' +
       'b58fe6d6d0607a423d9a6ba5fd0a4ec3a0b8f2c4/whatsapp.json';
   StickerPacks stickerPack = StickerPacks();
-  List<StickerPacks> st = [];
-  bool isLoading, isDownloading = true;
+  List<StickerPacks> st;
+  bool isDownloading = true;
   int iD = -1;
   List<String> downloadList = [];
   List<String> stickerImageList = [];
   @override
   void initState() {
     super.initState();
-    isLoading = true;
-    isDownloading = true;
     iD = -1;
-    this.getJsonData();
-  }
-
-  Future getJsonData() async {
-    var response = await http.get(
-      Uri.encodeFull(url),
-      headers: {"Accept": "application/json"},
-    );
-    setState(() {
-      Map datas = jsonDecode(response.body);
-      Model m = Model.formJson(datas);
-      for (Map<String, dynamic> json in m.stickerPac) {
-        List<Stickers> s = [];
-        for (Map<String, dynamic> stickers in json['stickers']) {
-          s.add(Stickers(imagefile: stickers['image_file'], emojis: stickers['emojis']));
-        }
-        print(json['publisher_email'] +
-            " " +
-            json['publisher_website'] +
-            " " +
-            json['privacy_policy_website'] +
-            " " +
-            json['license_agreement_website'] +
-            " ");
-        st.add(StickerPacks(
-            identifier: json['identifier'],
-            name: json['name'],
-            publisher: json['publisher'],
-            trayimagefile: json['tray_image_file'],
-            publisheremail: json['publisher_email'],
-            publisherwebsite: json['publisher_website'],
-            privacypolicywebsite: json['privacy_policy_website'],
-            licenseagreementwebsite: json['license_agreement_website'],
-            stickers: s));
-      }
-      isLoading = false;
-    });
+    st = widget.asdf;
   }
 
   navigateToDetailsScreen(id, context) {
@@ -90,125 +56,84 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Container(
         child: Center(
-          child: isLoading
-              ? CircularProgressIndicator()
-              : ListView.builder(
-                  itemCount: st.length,
-                  itemBuilder: (context, i) {
-                    return Card(
-                      child: Container(
-                        padding: EdgeInsets.all(10.0),
-                        child: Row(
+          child: ListView.builder(
+            itemCount: st.length,
+            itemBuilder: (context, i) {
+              return Card(
+                child: Container(
+                  padding: EdgeInsets.all(10.0),
+                  child: Row(
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: () {
+                          navigateToDetailsScreen(i, context);
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                navigateToDetailsScreen(i, context);
-                              },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Text(
-                                        st[i].name,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        ' • ',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                      Text(
-                                        st[i].publisher,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Wrap(
-                                    alignment: WrapAlignment.start,
-                                    crossAxisAlignment: WrapCrossAlignment.center,
-                                    direction: Axis.horizontal,
-                                    spacing: 8.0,
-                                    runSpacing: 4.0,
-                                    children: <Widget>[
-                                      Row(
-                                        children: <Widget>[
-                                          Image.network(
-                                            st[i].sticker[0].imagefile,
-                                            height: 70.0,
-                                            width: 70.0,
-                                          ),
-                                          Image.network(
-                                            st[i].sticker[1].imageFile,
-                                            height: 70.0,
-                                            width: 70.0,
-                                          ),
-                                          Image.network(
-                                            st[i].sticker[2].imageFile,
-                                            height: 70.0,
-                                            width: 70.0,
-                                          ),
-                                          st[i].sticker.length > 3
-                                              ? Image.network(
-                                                  st[i].sticker[3].imageFile,
-                                                  height: 70.0,
-                                                  width: 70.0,
-                                                )
-                                              : SizedBox(
-                                                  width: 70.0,
-                                                  height: 70.0,
-                                                ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
+                            Row(
                               children: <Widget>[
-                                Flex(
-                                  direction: Axis.horizontal,
+                                Text(
+                                  st[i].name,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  ' • ',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                Text(
+                                  st[i].publisher,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Wrap(
+                              alignment: WrapAlignment.start,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              direction: Axis.horizontal,
+                              spacing: 8.0,
+                              runSpacing: 4.0,
+                              children: <Widget>[
+                                Row(
                                   children: <Widget>[
-                                    if (!downloadList.contains(st[i].identiFier))
-                                      iD == i && !isDownloading
-                                          ? CircularProgressIndicator()
-                                          : IconButton(
-                                              icon: Icon(Icons.add),
-                                              onPressed: () {
-                                                setState(() {
-                                                  iD = i;
-                                                  isDownloading = false;
-                                                  print(isLoading);
-                                                  downloadSticker(st[i]);
-                                                });
-                                              },
-                                            ),
-                                    if (downloadList.contains(st[i].identiFier))
-                                      IconButton(
-                                        icon: Icon(Icons.add),
-                                        onPressed: () {
-                                          setState(() {
-                                            iD = i;
-                                            print(i);
-                                            addToWhatsapp(st[i]);
-                                          });
-                                        },
-                                      ),
+                                    Image.network(
+                                      st[i].sticker[0].imagefile,
+                                      height: 70.0,
+                                      width: 70.0,
+                                    ),
+                                    Image.network(
+                                      st[i].sticker[1].imageFile,
+                                      height: 70.0,
+                                      width: 70.0,
+                                    ),
+                                    Image.network(
+                                      st[i].sticker[2].imageFile,
+                                      height: 70.0,
+                                      width: 70.0,
+                                    ),
+                                    st[i].sticker.length > 3
+                                        ? Image.network(
+                                            st[i].sticker[3].imageFile,
+                                            height: 70.0,
+                                            width: 70.0,
+                                          )
+                                        : SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                          ),
                                   ],
                                 ),
                               ],
@@ -216,9 +141,47 @@ class _MyHomePageState extends State<MyHomePage> {
                           ],
                         ),
                       ),
-                    );
-                  },
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Flex(
+                            direction: Axis.horizontal,
+                            children: <Widget>[
+                              if (!downloadList.contains(st[i].identiFier))
+                                iD == i && !isDownloading
+                                    ? CircularProgressIndicator()
+                                    : IconButton(
+                                        icon: Icon(Icons.add),
+                                        onPressed: () {
+                                          setState(() {
+                                            iD = i;
+                                            isDownloading = false;
+                                            downloadSticker(st[i]);
+                                          });
+                                        },
+                                      ),
+                              if (downloadList.contains(st[i].identiFier))
+                                IconButton(
+                                  icon: Icon(Icons.add),
+                                  onPressed: () {
+                                    setState(() {
+                                      iD = i;
+                                      print(i);
+                                      addToWhatsapp(st[i]);
+                                    });
+                                  },
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -279,35 +242,38 @@ class _MyHomePageState extends State<MyHomePage> {
           print((rec / total) * 100);
         });
       }
-
-      try {
-        WhatsappstickerApi.addToJson(
-                identiFier: s.identiFier,
-                name: s.name,
-                publisher: s.publisher,
-                trayimagefile: basename(s.trayImageFile),
-                publisheremail: s.publisherEmail,
-                publisherwebsite: s.publisherWebsite,
-                privacypolicywebsite: s.privacyPolicyWebsite,
-                licenseagreementwebsite: s.licenseAgreementWebsite,
-                imagedataversion: "1",
-                avoidcache: false,
-                stickerImages: stickerImageList)
-            .then((value) {
-          print(value);
-        });
-      } on PlatformException catch (e) {
-        print(e.details);
-      }
-      setState(() {
-        isDownloading = true;
-        if (!downloadList.contains(s.identiFier)) {
-          downloadList.add(s.identiFier);
-        }
-      });
+      await addToJson(s);
     } else {
       print("not");
     }
+  }
+
+  Future<void> addToJson(StickerPacks s) {
+    try {
+      WhatsappstickerApi.addToJson(
+              identiFier: s.identiFier,
+              name: s.name,
+              publisher: s.publisher,
+              trayimagefile: basename(s.trayImageFile),
+              publisheremail: s.publisherEmail,
+              publisherwebsite: s.publisherWebsite,
+              privacypolicywebsite: s.privacyPolicyWebsite,
+              licenseagreementwebsite: s.licenseAgreementWebsite,
+              imagedataversion: "1",
+              avoidcache: false,
+              stickerImages: stickerImageList)
+          .then((value) {
+        print(value);
+      });
+    } on PlatformException catch (e) {
+      print(e.details);
+    }
+    setState(() {
+      isDownloading = true;
+      if (!downloadList.contains(s.identiFier)) {
+        downloadList.add(s.identiFier);
+      }
+    });
   }
 
   Future<void> showDialogs(context) {

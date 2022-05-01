@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:whatsappsticker_api_example/ui/StartPage.dart';
 import 'ui/HomePage.dart';
 
 void main() => runApp(MyApp());
@@ -12,9 +13,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
       ),
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(),
+      home: StartPage(),
     );
   }
 }
-
-
